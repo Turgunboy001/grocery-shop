@@ -24,6 +24,7 @@ const MyOrders = () => {
       const params = activeTab !== "all" ? `?status=${activeTab}` : "";
       const { data } = await api.get(`/orders${params}`);
       setOrders(data.orders);
+      console.log(data);
     } catch (error: any) {
       toast.error(error.response?.data?.message || error?.message);
     } finally {
