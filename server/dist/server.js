@@ -7,6 +7,8 @@ import uploadouter from "./routes/uploadRoutes.js";
 import orderRouter from "./routes/orderRouters.js";
 import { serve } from "inngest/express";
 import { inngest, functions } from "./inngest/index.js";
+import addressRouter from "./routes/addressRoutes.js";
+import adminRouter from "./routes/adminRoutes.js";
 const app = express();
 // Middleware
 app.use(cors());
@@ -19,6 +21,8 @@ app.use("/api/auth", authRouter);
 app.use("/api/products", productRoutes);
 app.use("/api/upload", uploadouter);
 app.use("/api/orders", orderRouter);
+app.use("/api/addresses", addressRouter);
+app.use("/api/admin", adminRouter);
 // ingest
 app.use("/api/inngest", serve({ client: inngest, functions }));
 // error handling
