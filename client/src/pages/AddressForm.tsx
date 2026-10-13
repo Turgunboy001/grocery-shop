@@ -1,5 +1,4 @@
 import { XIcon } from "lucide-react";
-import React from "react";
 
 const AddressForm = ({
   resetForm,
@@ -26,6 +25,7 @@ const AddressForm = ({
               {editingId ? "Edit Address" : "Add New Address"}
             </h2>
             <button
+              type="button"
               className="p-2 rounded-lg hover:bg-app-cream"
               onClick={resetForm}
             >
@@ -105,7 +105,7 @@ const AddressForm = ({
                     type="checkbox"
                     checked={form.isDefault}
                     onChange={(e) =>
-                      setForm({ ...form, isDefault: e.target.value })
+                      setForm({ ...form, isDefault: e.target.checked })
                     }
                   />
                   <span className="text-sm text-app-text">Set as default</span>

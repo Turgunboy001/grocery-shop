@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { categoriesData, dummyProducts } from "../assets/assets";
+import axios from "axios";
+import { categoriesData } from "../assets/assets";
 import {
-  ArrowRightFromLine,
   ChevronDown,
   Home,
   SlidersHorizontal,
@@ -11,6 +11,8 @@ import type { Product } from "../types";
 import ProductCard from "../components/ProductCard";
 import Loading from "../components/Loading";
 import FilterPanel from "../components/FilterPanel";
+import api from "../config/api";
+import toast from "react-hot-toast";
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -28,10 +30,29 @@ const Products = () => {
 
   const fetchProducts = async () => {
     setLoading(true);
-    setProducts(
-      dummyProducts.filter((p) => p.category === category || category === ""),
-    );
-    setLoading(false);
+    try {
+      const params = new URLSearchParams();
+      if (category) params.set("category", category);
+      if (organic) params.set("organic", organic);
+      if (sort) params.set("sort", sort);
+      if (minPrice) params.set("minPrice", minPrice);
+      if (maxPrice) params.set("maxPrice", maxPrice);
+      params.set("page", String(page));
+      params.set("limit", "12");
+
+      const { data } = await api.get(`/products?${params.toString()}`);
+      setProducts(data.products);
+      setTotalPages(data.pages);
+    } catch (error: unknown) {
+      const message = axios.isAxiosError(error)
+        ? error.response?.data?.message || error.message
+        : error instanceof Error
+          ? error.message
+          : "Failed to load products";
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const updateFilter = (key: string, value: string) => {
@@ -50,7 +71,7 @@ const Products = () => {
   const clearFilters = () => setSearchParams({});
 
   const activeCategory = categoriesData.find((c) => c.slug === category);
-  const hasFilters = category || organic || minPrice || maxPrice;
+  const hasFilters = Boolean(category || organic || minPrice || maxPrice);
 
   useEffect(() => {
     fetchProducts();
@@ -86,6 +107,38 @@ const Products = () => {
               />
             </div>
           </aside>
+          {mobileFiltersOpen && (
+            <div
+              className="fixed inset-0 z-50 bg-black/40 lg:hidden"
+              onClick={() => setMobileFiltersOpen(false)}
+            >
+              <div
+                className="absolute right-0 top-0 h-full w-80 max-w-[85vw] overflow-y-auto bg-white p-5"
+                onClick={(event) => event.stopPropagation()}
+              >
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="font-semibold text-app-green">Filters</h2>
+                  <button
+                    type="button"
+                    onClick={() => setMobileFiltersOpen(false)}
+                    aria-label="Close filters"
+                  >
+                    ×
+                  </button>
+                </div>
+                <FilterPanel
+                  categories={categoriesData}
+                  category={category}
+                  organic={organic}
+                  minPrice={minPrice}
+                  maxPrice={maxPrice}
+                  updateFilter={updateFilter}
+                  clearFilters={clearFilters}
+                  hasFilters={hasFilters}
+                />
+              </div>
+            </div>
+          )}
           {/* main content  */}
           <main className="flex-1">
             <div className="flex items-center justify-between mb-6">
@@ -111,6 +164,7 @@ const Products = () => {
                   <select
                     className="appearance-none pl-3 pr-8 py-2 text-sm bg-white rounded-xl border border-app-border focus:border-app-green outline-none cursor-pointer"
                     value={sort}
+                    onChange={(event) => updateFilter("sort", event.target.value)}
                   >
                     <option value="">Newset</option>
                     <option value="price_asc">Price: Low Hight</option>
@@ -133,7 +187,10 @@ const Products = () => {
                 <p className="text-sm text-app-text-light mb-4">
                   Try adjusting your filters or search terms
                 </p>
-                <button className="px-5 py-2 text-sm font-medium bg-app-green text-white rounded-xl hover:bg-app-green-light transition-colors">
+                <button
+                  onClick={clearFilters}
+                  className="px-5 py-2 text-sm font-medium bg-app-green text-white rounded-xl hover:bg-app-green-light transition-colors"
+                >
                   Clear Filters
                 </button>
               </div>
@@ -142,7 +199,7 @@ const Products = () => {
                 {products.map(
                   (product) =>
                     product.stock > 0 && (
-                      <ProductCard key={product._id} product={product} />
+                      <ProductCard key={product.id} product={product} />
                     ),
                 )}
               </div>
@@ -153,6 +210,7 @@ const Products = () => {
                 {Array.from({ length: totalPages }).map((_, i) => (
                   <button
                     key={i}
+                    onClick={() => updateFilter("page", String(i + 1))}
                     className={` size-9 rounded-lg text-sm font-medium transition-colors ${page === i + 1 ? "bg-app-green text-white" : "bg-white text-app-text-light hover:bg-app-cream"}`}
                   >
                     {i + 1}

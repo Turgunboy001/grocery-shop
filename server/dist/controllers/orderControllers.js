@@ -6,7 +6,7 @@ export const createOrder = async (req, res) => {
     const { items, shippingAddress, paymentMethod } = req.body;
     //   check if order items are empty
     if (!items || items.length === 0) {
-        res.status(400).json({ message: "No order items" });
+        return res.status(400).json({ message: "No order items" });
     }
     //   look up actual prices from the  database
     const productId = items.map((i) => i.product);
@@ -19,7 +19,7 @@ export const createOrder = async (req, res) => {
     console.log(productMap, "productMap");
     for (const item of items) {
         const product = productMap[item.product];
-        if ((!product || product.stock) ?? 0 < item.quantity) {
+        if (!product || (product.stock ?? 0) < item.quantity) {
             return res.status(404).json({ message: "Product out of stock" });
         }
     }

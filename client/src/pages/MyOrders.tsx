@@ -20,6 +20,10 @@ const MyOrders = () => {
     setOrders(dummyDashboardOrdersData as any);
     setLoading(false);
   };
+  const visibleOrders =
+    activeTab === "all"
+      ? orders
+      : orders.filter((order) => order.status === activeTab);
   useEffect(() => {
     if (searchParams.get("clearCart")) {
       clearCart();
@@ -44,6 +48,7 @@ const MyOrders = () => {
         <div className=" flex gap-2 mb-6 overflow-x-auto pb-2">
           {tabs.map((tab) => (
             <button
+              onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 text-sm font-medium rounded-xl whitespace-nowrap  transition-colors ${activeTab === tab ? "bg-app-green text-white" : "bg-white text-app-text-light hover:bg-app-cream"}`}
               key={tab}
             >
@@ -55,7 +60,7 @@ const MyOrders = () => {
         {/* order list  */}
         {loading ? (
           <Loading />
-        ) : orders.length === 0 ? (
+        ) : visibleOrders.length === 0 ? (
           <div className="text-center py-16">
             <PackageIcon className="size-16  text-app-border mx-auto mb-4" />
             <h2 className="text-lg font-medium text-app-green mb-2">
@@ -73,18 +78,18 @@ const MyOrders = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {orders.map((order) => (
+            {visibleOrders.map((order) => (
               <Link
-                to={`/orders/${order._id}`}
+                to={`/orders/${order.id}`}
                 className="block max-w-xl bg-white rounded-2xl p-5 hover:shadow transition-all"
-                key={order._id}
+                key={order.id}
               >
                 {/* order id, date & status  */}
                 <div className="flex items-start justify-between mb-3">
                   {/* left */}
                   <div>
                     <p className="text-sm font-medium text-app-green">
-                      Order #{order._id.slice(-8).toUpperCase()}
+                      Order #{order.id.slice(-8).toUpperCase()}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
                       <CalendarIcon className="size-3 text-app-text-light" />

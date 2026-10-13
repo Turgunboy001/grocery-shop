@@ -9,7 +9,7 @@ export default function AdminProductForm() {
     const isEdit = Boolean(id);
 
     const [loading, setLoading] = useState(isEdit);
-    const [saving, setSaving] = useState(false);
+    const [saving] = useState(false);
     const [imageFile, setImageFile] = useState<File | null>(null);
 
     const [formData, setFormData] = useState({
@@ -27,7 +27,20 @@ export default function AdminProductForm() {
     useEffect(() => {
         const fetchData = async () => {
             if (isEdit) {
-                setFormData(() => dummyProducts.find((p) => p._id === id) as any)
+                const product = dummyProducts.find((p) => p.id === id);
+                if (product) {
+                    setFormData({
+                        name: product.name,
+                        description: product.description,
+                        price: String(product.price),
+                        originalPrice: String(product.originalPrice),
+                        image: product.image,
+                        category: product.category,
+                        unit: product.unit,
+                        stock: String(product.stock),
+                        isOrganic: product.isOrganic,
+                    });
+                }
             }
             setLoading(false)
         };

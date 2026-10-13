@@ -6,7 +6,6 @@ import {
   PlusIcon,
   ShoppingBagIcon,
   Trash2Icon,
-  TrashIcon,
   XIcon,
 } from "lucide-react";
 
@@ -82,7 +81,7 @@ const CartSitebar = () => {
                     <div className="flex items-center gap-1.5">
                       <button
                         onClick={() =>
-                          updateQuantity(item.product._id, item.quantity - 1)
+                          updateQuantity(item.product.id, item.quantity - 1)
                         }
                         className=" size-7 rounded-lg bg-white border border-app-border flex-center"
                       >
@@ -95,7 +94,7 @@ const CartSitebar = () => {
 
                       <button
                         onClick={() =>
-                          updateQuantity(item.product._id, item.quantity + 1)
+                          updateQuantity(item.product.id, item.quantity + 1)
                         }
                         className=" size-7 rounded-lg bg-white border border-app-border flex-center"
                       >
@@ -108,7 +107,7 @@ const CartSitebar = () => {
                         {item.product.price * item.quantity}
                       </span>
                       <button
-                        onClick={() => removeFromCart(item.product._id)}
+                        onClick={() => removeFromCart(item.product.id)}
                         className=" p-1 text-app-text-light hover:text-app-error transition-colors"
                       >
                         <Trash2Icon className="size-4" />

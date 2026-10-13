@@ -5,7 +5,7 @@ import { heroSectionData } from "../../assets/assets";
 export default function DeliveryLogin() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
+    const [loading] = useState(false);
 
     const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();

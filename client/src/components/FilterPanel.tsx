@@ -1,3 +1,14 @@
+interface FilterPanelProps {
+  categories: { slug: string; name: string }[];
+  category: string;
+  minPrice: string;
+  maxPrice: string;
+  organic: string;
+  updateFilter: (key: string, value: string) => void;
+  clearFilters: () => void;
+  hasFilters: string | boolean;
+}
+
 const FilterPanel = ({
   categories,
   category,
@@ -7,7 +18,7 @@ const FilterPanel = ({
   updateFilter,
   clearFilters,
   hasFilters,
-}) => {
+}: FilterPanelProps) => {
   const categoriesWithAll = [
     { slug: "", name: "All Categories" },
     ...categories,
@@ -20,7 +31,7 @@ const FilterPanel = ({
           Categories
         </h3>
         <div className="space-y-1.5">
-          {categoriesWithAll.map((cat: any) => (
+          {categoriesWithAll.map((cat) => (
             <button
               key={cat.slug}
               onClick={() => updateFilter("category", cat.slug)}
@@ -31,6 +42,17 @@ const FilterPanel = ({
           ))}
         </div>
       </div>
+
+      <label className="flex items-center gap-2 text-sm text-app-text-light">
+        <input
+          type="checkbox"
+          checked={organic === "true"}
+          onChange={(e) =>
+            updateFilter("organic", e.target.checked ? "true" : "")
+          }
+        />
+        Organic only
+      </label>
 
       {/* price range  */}
 
@@ -58,6 +80,7 @@ const FilterPanel = ({
       </div>
       {hasFilters && (
         <button
+          onClick={clearFilters}
           className=" w-full py-2 text-sm text-app-error hover:bg-red-50 rounded-lg transition-colors font-medium
       "
         >

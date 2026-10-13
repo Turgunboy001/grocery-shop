@@ -49,14 +49,14 @@ export const login = async (req, res) => {
             .json({ message: "Please provide email and password" });
     }
     const user = await prisma.user.findUnique({
-        where: { email: email.toLowerCase(), include: { addresses: true } },
+        where: { email: email.toLowerCase() },
+        include: { addresses: true },
     });
     if (!user) {
         return res
             .status(400)
             .json({ message: "User already exists with this email" });
     }
-    const hashedPassword = await bcrypt.hash(password, 10);
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
         return res.status(400).json({ message: "Invalid email or password" });
