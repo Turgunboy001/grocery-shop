@@ -7,6 +7,7 @@ import { ArrowLeftIcon, MapIcon, PhoneIcon } from "lucide-react";
 import OrderOTP from "../components/OrderTracking/OrderOTP";
 import LiveMap from "../components/OrderTracking/LiveMap";
 import OrderTimeLine from "../components/OrderTracking/OrderTimeLine";
+import api from "../config/api";
 
 const OrderTracing = () => {
   const currency = import.meta.env.VITE_CURRENCY_SYMBOL || "$";
@@ -20,10 +21,11 @@ const OrderTracing = () => {
   } | null>(null);
 
   useEffect(() => {
-    const foundOrder = dummyDashboardOrdersData.find((o) => o.id === id);
-    setOrder((foundOrder as Order | undefined) ?? null);
-    setLiveLocation(foundOrder?.liveLocation ?? null);
-    setLoading(false);
+    api
+      .get(`/orders/${id}`)
+      .then((res) => setOrder(res.data.order))
+      .catch(() => navigate("/orders"))
+      .finally(() => setLoading(false));
   }, [id, navigate]);
 
   if (loading) return <Loading />;

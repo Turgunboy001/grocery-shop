@@ -84,7 +84,7 @@ export const getUserOrders = async (req, res) => {
     const { status } = req.query;
     const where = {
         userId: req.user.id,
-        NOT: [{ PaymentMethod: "card", isPaid: false }],
+        NOT: [{ paymentMethod: "card", isPaid: false }],
     };
     if (status && status !== "all") {
         where.status = status;
