@@ -16,19 +16,17 @@ import {
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
-  const user: any = {
-    name: "Jhone Doe",
-    email: "jhon@gmail.com",
-    isAdmin: true,
-  };
+  const { user, logout } = useAuth();
   const { cartCount, setIsCartOpen } = useCart();
   const [searchQuery, setSearchQuery] = useState("");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    logout();
     setUserMenuOpen(false);
     navigate("/");
   };
