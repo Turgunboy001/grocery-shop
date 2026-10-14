@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import type { Order } from "../types";
-import { dummyDashboardOrdersData } from "../assets/assets";
 import Loading from "../components/Loading";
 import { ArrowLeftIcon, MapIcon, PhoneIcon } from "lucide-react";
 import OrderOTP from "../components/OrderTracking/OrderOTP";
 import LiveMap from "../components/OrderTracking/LiveMap";
 import OrderTimeLine from "../components/OrderTracking/OrderTimeLine";
 import api from "../config/api";
+import toast from "react-hot-toast";
 
 const OrderTracing = () => {
   const currency = import.meta.env.VITE_CURRENCY_SYMBOL || "$";
@@ -19,6 +19,7 @@ const OrderTracing = () => {
     lat: number;
     lng: number;
   } | null>(null);
+  const locationErrorShown = useRef(false);
 
   useEffect(() => {
     api
@@ -33,21 +34,31 @@ const OrderTracing = () => {
 
     const fetchLocation = async () => {
       try {
-        const { data } = await api.get("/");
+        const { data } = await api.get(`/orders/${id}/location`);
+        const location = data.liveLocation;
         if (
-          data.liveLocation?.lat &&
-          data.liveLocation?.lng &&
-          data.liveLocation?.updateAt
+          typeof location?.lat === "number" &&
+          typeof location?.lng === "number"
         ) {
           setLiveLocation({
-            lat: data.liveLocation.lat,
-            lng: data.liveLocation.lng,
+            lat: location.lat,
+            lng: location.lng,
           });
         }
         if (data.status && data.status !== order.status) {
           setOrder((prev) => (prev ? { ...prev, status: data.status } : prev));
         }
-      } catch (error) {}
+        locationErrorShown.current = false;
+      } catch (error: any) {
+        if (!locationErrorShown.current) {
+          toast.error(
+            error.response?.data?.message ||
+              error.message ||
+              "Failed to update delivery location",
+          );
+          locationErrorShown.current = true;
+        }
+      }
     };
     fetchLocation();
     const interval = setInterval(fetchLocation, 10000);
@@ -84,7 +95,7 @@ const OrderTracing = () => {
             </p>
           </div>
           <span
-            className={` px-4 py-1.5 text-sm font-semibold rounded-full ${order!.status === "Delivered" ? "bg-green-100 text-green-700" : order!.status === "Canceled" ? "bg-red-100 text-red-700" : "bg-app-orange/10 text-app-orange"}`}
+            className={` px-4 py-1.5 text-sm font-semibold rounded-full ${order!.status === "Delivered" ? "bg-green-100 text-green-700" : order!.status === "Cancelled" ? "bg-red-100 text-red-700" : "bg-app-orange/10 text-app-orange"}`}
           >
             {order!.status}
           </span>

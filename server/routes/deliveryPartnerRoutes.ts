@@ -19,7 +19,7 @@ deliveryPartnerRoutes.get(
   getDeliveryDetails,
 );
 deliveryPartnerRoutes.put(
-  "/my-deliveries/:id/complate",
+  "/my-deliveries/:id/complete",
   deliveryAuth,
   complateDelivery,
 );

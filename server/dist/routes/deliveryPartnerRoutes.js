@@ -5,7 +5,7 @@ const deliveryPartnerRoutes = express.Router();
 deliveryPartnerRoutes.post("/login", loginPartner);
 deliveryPartnerRoutes.get("/my-deliveries", deliveryAuth, getMyDeliveries);
 deliveryPartnerRoutes.get("/my-deliveries/:id", deliveryAuth, getDeliveryDetails);
-deliveryPartnerRoutes.get("/my-deliveries/:id/complate", deliveryAuth, complateDelivery);
+deliveryPartnerRoutes.put("/my-deliveries/:id/complete", deliveryAuth, complateDelivery);
 deliveryPartnerRoutes.put("/my-deliveries/:id/cancel", deliveryAuth, cancelDelivery);
 deliveryPartnerRoutes.put("/my-deliveries/:id/status", deliveryAuth, updateDeliveryStatus);
 deliveryPartnerRoutes.put("/my-deliveries/:id/location", deliveryAuth, updateLocation);

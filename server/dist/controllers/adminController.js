@@ -76,37 +76,34 @@ export const updateDeliveryPartner = async (req, res) => {
 };
 // assign delivery partner for order
 export const assignDeliveryPartner = async (req, res) => {
-    const { partnerId } = req.body ?? {};
-    if (!partnerId) {
-        return res.status(400).json({ message: "Delivery partner is required" });
-    }
-    const order = await prisma.order.findUnique({
-        where: { id: req.params.id },
-    });
-    const partner = await prisma.deliveryPartner.findUnique({
-        where: { id: partnerId },
-    });
-    const otp = String(Math.floor(100000 + Math.random() * 90000));
-    let status = order.status;
-    const history = Array.isArray(order.statusHistory)
-        ? order.statusHistory
-        : [];
-    if (order?.status === "placed" || order?.status === "confirmed") {
-        status = "Assigned";
+    try {
+        const { partnerId } = req.body;
+        if (!partnerId) {
+            return res.status(400).json({ message: "partnerId is required" });
+        }
+        const order = await prisma.order.findUnique({
+            where: { id: req.params.id },
+        });
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+        const history = (Array.isArray(order.statusHistory) ? order.statusHistory : []);
         history.push({
             status: "Assigned",
-            note: `Assigned to ${partner.name}`,
+            note: "Assigned to delivery partner",
             timestamp: new Date(),
         });
+        const updated = await prisma.order.update({
+            where: { id: order.id },
+            data: {
+                deliveryPartnerId: partnerId,
+                status: "Assigned",
+                statusHistory: history,
+            },
+        });
+        res.json({ order: updated });
     }
-    await prisma.order.update({
-        where: { id: order.id },
-        data: {
-            deliveryPartnerId: partner.id,
-            deliveryOtp: otp,
-            status,
-            statusHistory: history,
-        },
-    });
-    res.json({ order });
+    catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
