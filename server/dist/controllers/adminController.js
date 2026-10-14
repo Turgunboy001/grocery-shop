@@ -76,7 +76,10 @@ export const updateDeliveryPartner = async (req, res) => {
 };
 // assign delivery partner for order
 export const assignDeliveryPartner = async (req, res) => {
-    const { partnerId } = req.body;
+    const { partnerId } = req.body ?? {};
+    if (!partnerId) {
+        return res.status(400).json({ message: "Delivery partner is required" });
+    }
     const order = await prisma.order.findUnique({
         where: { id: req.params.id },
     });

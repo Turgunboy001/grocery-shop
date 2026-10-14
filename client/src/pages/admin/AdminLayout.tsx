@@ -22,9 +22,9 @@ export default function AdminLayout() {
     { to: "/admin/delivery-partners", label: "Delivery Partners", icon: Truck },
     { to: "/", label: "Exit", icon: LogOutIcon },
   ];
-  // if (!user?.isAdmin) {
-  //   // return <Navigate to={"/"} replace />;
-  // }
+  if (!user?.isAdmin) {
+    return <Navigate to={"/"} replace />;
+  }
 
   return (
     <div className="h-screen overflow-hidden">
