@@ -7,20 +7,17 @@ export const getAdminStats = async (req: Request, res: Response) => {
   const [
     totalOrders,
     totalUsers,
-    totaProducts,
+    totalProducts,
     outOfStock,
     totalPartners,
     recentOrders,
   ] = await Promise.all([
-    prisma.order.count({
-      where: { NOT: [{ paymentMethod: "card", isPaid: false }] },
-    }),
+    prisma.order.count(),
     prisma.user.count(),
     prisma.product.count(),
     prisma.product.count({ where: { stock: 0 } }),
     prisma.deliveryPartner.count(),
     prisma.order.findMany({
-      where: { NOT: [{ paymentMethod: "card", isPaid: false }] },
       orderBy: { createdAt: "desc" },
       take: 8,
       include: {
@@ -30,7 +27,7 @@ export const getAdminStats = async (req: Request, res: Response) => {
     }),
   ]);
   res.json({
-    totaProducts,
+    totalProducts,
     totalOrders,
     totalPartners,
     totalUsers,

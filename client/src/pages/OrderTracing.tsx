@@ -27,6 +27,32 @@ const OrderTracing = () => {
       .catch(() => navigate("/orders"))
       .finally(() => setLoading(false));
   }, [id, navigate]);
+  useEffect(() => {
+    if (!order || ["Delivered", "Cancelled", "Placed"].includes(order.status))
+      return;
+
+    const fetchLocation = async () => {
+      try {
+        const { data } = await api.get("/");
+        if (
+          data.liveLocation?.lat &&
+          data.liveLocation?.lng &&
+          data.liveLocation?.updateAt
+        ) {
+          setLiveLocation({
+            lat: data.liveLocation.lat,
+            lng: data.liveLocation.lng,
+          });
+        }
+        if (data.status && data.status !== order.status) {
+          setOrder((prev) => (prev ? { ...prev, status: data.status } : prev));
+        }
+      } catch (error) {}
+    };
+    fetchLocation();
+    const interval = setInterval(fetchLocation, 10000);
+    return () => clearInterval(interval);
+  }, [id, order?.status]);
 
   if (loading) return <Loading />;
   if (!order) return null;
