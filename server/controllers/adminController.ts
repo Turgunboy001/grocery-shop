@@ -88,41 +88,40 @@ export const updateDeliveryPartner = async (req: Request, res: Response) => {
 
 // assign delivery partner for order
 export const assignDeliveryPartner = async (req: Request, res: Response) => {
-  const { partnerId } = req.body ?? {};
-  if (!partnerId) {
-    return res.status(400).json({ message: "Delivery partner is required" });
-  }
+  try {
+    const { partnerId } = req.body;
 
-  const order = await prisma.order.findUnique({
-    where: { id: req.params.id as string },
-  });
-  const partner = await prisma.deliveryPartner.findUnique({
-    where: { id: partnerId },
-  });
-  const otp = String(Math.floor(100000 + Math.random() * 90000));
+    if (!partnerId) {
+      return res.status(400).json({ message: "partnerId is required" });
+    }
 
-  let status = order!.status;
+    const order = await prisma.order.findUnique({
+      where: { id: req.params.id as string },
+    });
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
 
-  const history: any = Array.isArray(order!.statusHistory)
-    ? order!.statusHistory
-    : [];
-
-  if (order?.status === "placed" || order?.status === "confirmed") {
-    status = "Assigned";
+    const history = (
+      Array.isArray(order.statusHistory) ? order.statusHistory : []
+    ) as any[];
     history.push({
       status: "Assigned",
-      note: `Assigned to ${partner!.name}`,
+      note: "Assigned to delivery partner",
       timestamp: new Date(),
     });
+
+    const updated = await prisma.order.update({
+      where: { id: order.id },
+      data: {
+        deliveryPartnerId: partnerId,
+        status: "Assigned",
+        statusHistory: history,
+      },
+    });
+
+    res.json({ order: updated });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
   }
-  await prisma.order.update({
-    where: { id: order!.id },
-    data: {
-      deliveryPartnerId: partner!.id,
-      deliveryOtp: otp,
-      status,
-      statusHistory: history,
-    },
-  });
-  res.json({ order });
 };

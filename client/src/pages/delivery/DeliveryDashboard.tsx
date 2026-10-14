@@ -44,6 +44,12 @@ export default function DeliveryDashboard() {
     } finally {
       setLoading(false);
     }
+    const { data } = await axios.get(
+      `${API_URL}/delivery/my-deliveries?status=${tab}`,
+      getAuthHeaders(),
+    );
+    console.log("RESPONSE:", data); // backend nima qaytardi
+    setOrders(data.orders ?? []);
   };
 
   console.log(orders);
