@@ -36,7 +36,7 @@ export const getDeliveryPartners = async (req, res) => {
 // create delivery partner profile
 export const createDeliveryPartner = async (req, res) => {
     const { name, email, password, phone, vehicleType } = req.body;
-    if (!name || !email || !password || phone) {
+    if (!name || !email || !password || !phone) {
         res.status(400).json({ message: "Please provide all required fields" });
         return;
     }
@@ -62,8 +62,7 @@ export const updateDeliveryPartner = async (req, res) => {
         data.phone = phone;
     if (vehicleType)
         data.vehicleType = vehicleType;
-    if (isActive)
-        data.isActive = isActive;
+    data.isActive = isActive;
     try {
         const partner = await prisma.deliveryPartner.update({
             where: { id: req.params.id },
