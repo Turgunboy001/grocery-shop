@@ -70,8 +70,9 @@ export const getMyDeliveries = async (req: Request, res: Response) => {
       include: { user: { select: { name: true, email: true, phone: true } } },
       orderBy: { createdAt: "desc" },
     });
-
-    res.json({ orders });
+    res.json({
+      orders: orders.map(({ deliveryOtp: _deliveryOtp, ...order }) => order),
+    });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -90,7 +91,8 @@ export const getDeliveryDetails = async (req: Request, res: Response) => {
     if (!order) {
       return res.status(404).json({ message: "Delivery not found" });
     }
-    res.json({ order });
+    const { deliveryOtp: _deliveryOtp, ...delivery } = order;
+    res.json({ order: delivery });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }

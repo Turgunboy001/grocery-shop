@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import { randomInt } from "node:crypto";
 import { prisma } from "../config/prisma.js";
 // get admin dashbord data
 export const getAdminStats = async (req, res) => {
@@ -88,6 +89,7 @@ export const assignDeliveryPartner = async (req, res) => {
             return res.status(404).json({ message: "Order not found" });
         }
         const history = (Array.isArray(order.statusHistory) ? order.statusHistory : []);
+        const deliveryOtp = String(randomInt(100000, 1000000));
         history.push({
             status: "Assigned",
             note: "Assigned to delivery partner",
@@ -97,6 +99,7 @@ export const assignDeliveryPartner = async (req, res) => {
             where: { id: order.id },
             data: {
                 deliveryPartnerId: partnerId,
+                deliveryOtp,
                 status: "Assigned",
                 statusHistory: history,
             },

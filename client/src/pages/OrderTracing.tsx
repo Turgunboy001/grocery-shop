@@ -3,11 +3,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import type { Order } from "../types";
 import Loading from "../components/Loading";
 import { ArrowLeftIcon, MapIcon, PhoneIcon } from "lucide-react";
-import OrderOTP from "../components/OrderTracking/OrderOTP";
 import LiveMap from "../components/OrderTracking/LiveMap";
 import OrderTimeLine from "../components/OrderTracking/OrderTimeLine";
 import api from "../config/api";
 import toast from "react-hot-toast";
+import OrderOTP from "../components/OrderTracking/OrderOTP";
 
 const OrderTracing = () => {
   const currency = import.meta.env.VITE_CURRENCY_SYMBOL || "$";
@@ -67,6 +67,7 @@ const OrderTracing = () => {
 
   if (loading) return <Loading />;
   if (!order) return null;
+  console.log(order);
 
   return (
     <div className="min-h-screen mb-20 bg-app-cream">

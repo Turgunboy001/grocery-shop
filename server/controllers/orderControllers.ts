@@ -216,12 +216,16 @@ export const getOrderLocation = async (req: Request, res: Response) => {
   try {
     const order = await prisma.order.findFirst({
       where: { id: req.params.id as string, userId: req.user!.id },
-      select: { liveLocation: true, status: true },
+      select: { liveLocation: true, status: true, deliveryOtp: true },
     });
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
-    res.json({ liveLocation: order.liveLocation, status: order.status });
+    res.json({
+      liveLocation: order.liveLocation,
+      status: order.status,
+      deliveryOtp: order.deliveryOtp,
+    });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
