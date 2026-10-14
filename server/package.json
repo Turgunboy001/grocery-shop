@@ -8,6 +8,7 @@
     "postinstall": "npx prisma generate",
     "start": "tsx server.ts",
     "server": "nodemon --exec tsx server.ts",
+    "test:cloud": "tsx test-cloudinary.ts",
     "build": "tsc",
     "seed": "tsx seed.ts"
   },

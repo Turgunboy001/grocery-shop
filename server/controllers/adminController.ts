@@ -48,7 +48,7 @@ export const getDeliveryPartners = async (req: Request, res: Response) => {
 export const createDeliveryPartner = async (req: Request, res: Response) => {
   const { name, email, password, phone, vehicleType } = req.body;
 
-  if (!name || !email || !password || phone) {
+  if (!name || !email || !password || !phone) {
     res.status(400).json({ message: "Please provide all required fields" });
     return;
   }
