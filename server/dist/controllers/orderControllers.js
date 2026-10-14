@@ -137,7 +137,6 @@ export const updateOrderStatus = async (req, res) => {
 // GET /api/orders/all
 export const getAllOrders = async (req, res) => {
     const orders = await prisma.order.findMany({
-        where: { NOT: [{ paymentMethod: "card", isPaid: false }] },
         include: {
             user: { select: { name: true, email: true } },
             deliveryPartner: { select: { name: true, phone: true, email: true } },
