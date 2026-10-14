@@ -66,30 +66,17 @@ uploadRouter.post(
       return res.status(200).json({
         url: result.secure_url,
       });
-    } catch (error) {
-      console.error("UPLOAD ERROR:", error);
-
-      if (error && typeof error === "object") {
-        const err = error as {
-          message?: string;
-          http_code?: number;
-          error?: unknown;
-          name?: string;
-        };
-
-        console.error("Cloudinary error details:", {
-          message: err.message,
-          http_code: err.http_code,
-          error: err.error,
-          name: err.name,
-        });
-      }
+    } catch (error: any) {
+      console.error(
+        "UPLOAD ERROR:",
+        JSON.stringify(error, Object.getOwnPropertyNames(error)),
+      );
 
       return res.status(500).json({
-        message:
-          error instanceof Error
-            ? error.message
-            : "Rasm yuklashda noma'lum xatolik",
+        message: error?.message || "Upload failed",
+        http_code: error?.http_code || null,
+        name: error?.name || null,
+        details: error?.error || null,
       });
     }
   },
