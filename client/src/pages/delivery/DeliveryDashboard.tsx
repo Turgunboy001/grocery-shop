@@ -31,6 +31,7 @@ export default function DeliveryDashboard() {
   const [cancelModal, setCancelModal] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState("");
   const watchIdRef = useRef<number>(null);
+  const locationErrorShown = useRef(false);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -55,7 +56,7 @@ export default function DeliveryDashboard() {
 
   useEffect(() => {
     const activeOrders = orders.filter((o) =>
-      ["Assigned", "Packed", "Out of Delivery"].includes(o.status),
+      ["Assigned", "Packed", "Out for Delivery"].includes(o.status),
     );
     if (activeOrders.length === 0 || !tracking) {
       if (watchIdRef.current !== null) {
@@ -64,26 +65,44 @@ export default function DeliveryDashboard() {
       }
       return;
     }
-    const sendLocation = (pos: GeolocationPosition) => {
+    if (!navigator.geolocation) {
+      toast.error("This device does not support location sharing");
+      setTracking(false);
+      return;
+    }
+
+    const showLocationError = (error?: GeolocationPositionError) => {
+      if (locationErrorShown.current) return;
+      toast.error(
+        error?.message || "Could not share your location. Check location access.",
+      );
+      locationErrorShown.current = true;
+    };
+
+    const sendLocation = async (pos: GeolocationPosition) => {
       const { latitude: lat, longitude: lng } = pos.coords;
-      activeOrders.forEach((order) => {
-        axios
-          .put(
+      const results = await Promise.allSettled(
+        activeOrders.map((order) =>
+          axios.put(
             `${API_URL}/delivery/my-deliveries/${order.id}/location`,
             { lat, lng },
             getAuthHeaders(),
-          )
-          .catch(() => {});
-      });
+          ),
+        ),
+      );
+      if (results.some((result) => result.status === "rejected")) {
+        showLocationError();
+        return;
+      }
+      locationErrorShown.current = false;
     };
     watchIdRef.current = navigator.geolocation.watchPosition(
       sendLocation,
-      () => {},
+      showLocationError,
       { enableHighAccuracy: true, maximumAge: 10000 },
     );
-    // also  send on interval for more consistent updates
     const interval = setInterval(() => {
-      navigator.geolocation.getCurrentPosition(sendLocation, () => {}, {
+      navigator.geolocation.getCurrentPosition(sendLocation, showLocationError, {
         enableHighAccuracy: true,
       });
     }, 10000);

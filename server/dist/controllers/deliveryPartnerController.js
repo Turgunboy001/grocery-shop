@@ -192,6 +192,16 @@ export const updateDeliveryStatus = async (req, res) => {
 export const updateLocation = async (req, res) => {
     try {
         const { lat, lng } = req.body;
+        if (typeof lat !== "number" ||
+            typeof lng !== "number" ||
+            !Number.isFinite(lat) ||
+            !Number.isFinite(lng) ||
+            lat < -90 ||
+            lat > 90 ||
+            lng < -180 ||
+            lng > 180) {
+            return res.status(400).json({ message: "Valid latitude and longitude are required" });
+        }
         const order = await prisma.order.findFirst({
             where: {
                 id: req.params.id,
